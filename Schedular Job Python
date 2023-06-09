@@ -1,0 +1,26 @@
+#import the modules
+from apscheduler.triggers.combining import OrTrigger
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+import polars as pl
+from sqlalchemy import create_engine
+import urllib
+import pandas as pd
+import pyodbc
+#a function that reads a excel file thru polars, convert it to pandas give all information about the database, establish a connection and send the file to database 
+def foo():
+    df = pl.read_excel(file)
+    df1 = df.to_pandas()
+    Table_name = 'Tablename'
+    schema = 'Schemaname'
+    quoted = urllib.parse.quote_plus('Driver={Database Driver}; Server = 'ServerName'; Port = 'Port Number'; uid='UserID'; pwd = 'password'; DATABASE = 'Database name'; Trusted_Connnection=No;')
+    engine = create_engine('database+pyodbc:///?odbc_connect={}'.format(quoted),fast_excutemany = True)
+    df1.to_sql(name, schema = 'schemaname', if_exists = 'replace', index = False)
+
+#Trigger a job at the specified time and give the name of the function which needs to be triggered 
+trigger = OrTrigger([
+   CronTrigger(hour = '18', minutes = '06'),
+])
+
+sched.add_job(foo, trigger)
+sched.start()
